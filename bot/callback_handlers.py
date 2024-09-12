@@ -2,7 +2,7 @@ from aiogram import Router
 from filters import *
 from python_db import coloda, index_list
 from aiogram.filters import StateFilter
-import asyncio
+from contextlib import suppress
 from aiogram.types import CallbackQuery, InputMediaPhoto
 from python_db import users_db
 from aiogram.exceptions import TelegramBadRequest
@@ -64,6 +64,16 @@ async def skip_process(callback: CallbackQuery, state: FSMContext):
 async def skip_zusamm_process(callback: CallbackQuery, state: FSMContext):
     print('skip_zusamm_process works')
     user_id = callback.from_user.id
+    temp_data = users_db[user_id]['zusamm_inline_button']
+    if temp_data:
+        with suppress(TelegramBadRequest):
+            await temp_data.delete()
+            users_db[user_id]['zusamm_inline_button'] = ''
+    temp_data = users_db[user_id]['secret_code']
+    if temp_data:
+        with suppress(TelegramBadRequest):
+            await temp_data.delete()
+            users_db[user_id]['secret_code'] = ''
     await state.update_data(cart_pos=0)
     spiel_index = users_db[user_id]['uniq_spiel_kode']
     bot_dict = await dp.storage.get_data(key=bot_storage_key)
@@ -72,7 +82,7 @@ async def skip_zusamm_process(callback: CallbackQuery, state: FSMContext):
     else:
         zusamm_list = bot_dict[spiel_index]
         key = choice(zusamm_list)
-        bot_dict[spiel_index].remove(key)
+        bot_dict[spiel_index].remove(key)  # Удаляю карту из колоды
         # print('bot_dict[spiel_index] = ', bot_dict[spiel_index])
         await dp.storage.update_data(key=bot_storage_key, data=bot_dict)
         users_db[user_id]['explaining_card'] = key
@@ -84,7 +94,8 @@ async def skip_zusamm_process(callback: CallbackQuery, state: FSMContext):
                 reply_markup=cart_kb)
         except TelegramBadRequest:  # Срабатывает, когда выдаёт первую карточку
             print('////Into Exeption skip_zusamm_process 86 line')
-            await callback.message.answer_photo(photo=coloda[key][0],  reply_markup=cart_kb)
+            att = await callback.message.answer_photo(photo=coloda[key][0],  reply_markup=cart_kb)
+            users_db[user_id]['bot_answer'] = att
         await callback.answer()
 
 

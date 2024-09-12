@@ -16,3 +16,5 @@ admin_eintritt =('сколько юзеров запустило бота   /sko
                  '🤗')
 
 spiel_beschlisst = 'Chief hat das Spiel beendet  😢'
+
+exit_from_zusamm = 'Um ein Koop-Spiel zu beenden, klicken Sie auf  /exit'
