@@ -42,7 +42,7 @@ async def process_start_command(message: Message, state: FSMContext):
         await add_in_list(user_id)  # Кто стартанул бота - добавляю в список админа
     else:
         users_db[message.from_user.id] = deepcopy(user_dict) # Просто создаю юзеру БД для сообщений
-        await message.answer('Бот перезапущен на сервере')
+        await message.answer('Der Bot wurde auf dem Server neu gestartet')
 
 
 

@@ -10,7 +10,7 @@ async def set_main_menu(bot):
                    description='Bekommen die Karte'),
 
         BotCommand(command='/help',
-                   description='Узнать о моих возможностях'),
+                   description='meine Faehigkeiten'),
 
         BotCommand(command='/zusammen_spielen',
                    description='Spielen mit Freunde'),
@@ -29,5 +29,5 @@ pre_start_button = KeyboardButton(text='/start')
 pre_start_clava = ReplyKeyboardMarkup(
     keyboard=[[pre_start_button]],
     resize_keyboard=True,
-    input_field_placeholder='Приятного чтения'
+    input_field_placeholder='Beginn spielen !'
 )
