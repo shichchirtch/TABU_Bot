@@ -258,15 +258,15 @@ async def send_message(message: Message, state: FSMContext ):
 @ch_router.message(StateFilter(FSM_ST.admin))
 async def send_message(message: Message, state: FSMContext):
     us_list = await return_quantity_users()
-    us_list.remove(6685637602)
-    await message.send_copy(chat_id=6831521683)
-    # for chat_id in us_list:
-    #     # try:
-    #     #     await message.send_copy(chat_id=chat_id)
-    #     # except TelegramForbiddenError:
-    #     #     pass
-    #     await message.send_copy(chat_id=chat_id)
-    #     await asyncio.sleep(0.2)
+    # await message.send_copy(chat_id=6831521683) # Второй акаунт
+    for chat_id in us_list:
+        try:
+            await message.send_copy(chat_id=chat_id)
+            await asyncio.sleep(0.2)
+        except Exception:
+            pass
+        # await message.send_copy(chat_id=chat_id)
+
     await state.set_state(FSM_ST.alone)
     await message.answer('Mailing abgeschlossen')
 
