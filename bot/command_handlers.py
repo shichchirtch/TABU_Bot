@@ -10,12 +10,12 @@ from external_functions import scheduler_job
 from copy import deepcopy
 from aiogram.fsm.context import FSMContext
 from keyboards import pre_start_clava
-from bot_instance import FSM_ST, bot, bot_storage_key, dp
+from bot_instance import FSM_ST, bot_storage_key, dp
 from random import randint, choice
 from contextlib import suppress
 from inlinekeyboards import *
 from postgress_function import *
-from aiogram.exceptions import TelegramBadRequest
+from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
 
 
 ch_router = Router()
@@ -246,6 +246,7 @@ async def admin_enter(message: Message):
 
 @ch_router.message(Command('skolko'), IS_ADMIN())
 async def get_quantyty_users(message: Message):
+    print('\n\nSkolko works\n\n')
     qu = await return_quantity_users()
     await message.answer(f'Бота запустили {len(qu)} юзеров')
 
@@ -258,10 +259,14 @@ async def send_message(message: Message, state: FSMContext ):
 async def send_message(message: Message, state: FSMContext):
     us_list = await return_quantity_users()
     us_list.remove(6685637602)
-    for chat_id in us_list:
-        await message.send_copy(chat_id=chat_id)
-        await asyncio.sleep(0.2)
-
+    await message.send_copy(chat_id=6831521683)
+    # for chat_id in us_list:
+    #     # try:
+    #     #     await message.send_copy(chat_id=chat_id)
+    #     # except TelegramForbiddenError:
+    #     #     pass
+    #     await message.send_copy(chat_id=chat_id)
+    #     await asyncio.sleep(0.2)
     await state.set_state(FSM_ST.alone)
     await message.answer('Mailing abgeschlossen')
 
