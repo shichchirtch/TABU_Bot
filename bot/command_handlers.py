@@ -1,7 +1,7 @@
 from aiogram import Router, html, F
-import asyncio
+import asyncio, os
 from aiogram.enums import ParseMode
-from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types import Message, ReplyKeyboardRemove, ContentType
 from aiogram.filters import CommandStart, Command, StateFilter
 from python_db import user_dict, users_db, coloda, index_list, bot_command_list
 from filters import PRE_START, IS_DIGIT, IS_ADMIN
@@ -10,12 +10,14 @@ from external_functions import scheduler_job
 from copy import deepcopy
 from aiogram.fsm.context import FSMContext
 from keyboards import pre_start_clava
-from bot_instance import FSM_ST, bot_storage_key, dp
+from bot_instance import FSM_ST, bot_storage_key, dp, user_recording_status
 from random import randint, choice
 from contextlib import suppress
 from inlinekeyboards import *
 from postgress_function import *
 from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
+from sprech_carten import sprech_dict
+from process_audio import process_audio_file, notify_user_20_seconds
 
 
 ch_router = Router()
@@ -29,7 +31,7 @@ async def process_start_command(message: Message, state: FSMContext):
         users_db[message.from_user.id] = deepcopy(user_dict)
         await insert_new_user_in_admin_table(user_id)
         await state.set_state(FSM_ST.after_start)
-        await state.set_data({'card_list':[], 'cart_pos':0, 'timer':0, 'leader':0})
+        await state.set_data({'card_list':[], 'cart_pos':0, 'timer':0, 'leader':0,'erc':''})
         await message.answer(text=f'{html.bold(html.quote(user_name))}, '
                                   f'Hallo !\n'
                                   f'Ich bin Bot für Spiele TABU spielen\n\n'
@@ -168,7 +170,7 @@ async def join_to_team(message: Message):
     await message.delete()
 
 
-@ch_router.message(Command('exit'), StateFilter(FSM_ST.zusamm))
+@ch_router.message(Command('exit'), StateFilter(FSM_ST.zusamm, FSM_ST.erclar))
 async def exit_zusammen_spiel(message: Message, state:FSMContext):
     user_id = message.from_user.id
     temp_data = users_db[user_id]['bot_answer']
@@ -178,7 +180,9 @@ async def exit_zusammen_spiel(message: Message, state:FSMContext):
             await temp_message.delete()
             users_db[user_id]['bot_answer'] = ''
     us_redis_dict = await state.get_data()
-    await state.set_state(FSM_ST.alone)
+
+    await state.set_state(FSM_ST.alone)  # Вывожу из состояния объяснения с ботом
+    await state.update_data(erc='') #  Обнуляю карточку
 
     temp_data = users_db[user_id]['bot_answer']
     if temp_data:
@@ -237,6 +241,65 @@ async def timer(message: Message, state: FSMContext):
         await asyncio.sleep(5)
         await att.delete()
 
+@ch_router.message(Command('erklaeren'), StateFilter(FSM_ST.after_start, FSM_ST.alone))
+async def process_erklaeren_command(message: Message, state:FSMContext):
+    user_id = message.from_user.id
+    user_recording_status[user_id] = True
+    await state.set_state(FSM_ST.erclar)
+    await message.answer(f"Halten Sie das Mikrofon gedrückt und beginnen Sie zu sprechen. Sie haben maximal 45 Sekunden Zeit.")
+    # Запускаем задачу с уведомлением
+    asyncio.create_task(notify_user_20_seconds(user_id))
+    definitiv = choice(sorted(sprech_dict))  # blume
+    erste_card = sprech_dict[definitiv]
+    await state.update_data(erc=definitiv) # Передаю название объясняемого слова
+    att = await message.answer_photo(photo=erste_card[0],
+                               reply_markup=sprech_kb)
+    users_db[user_id]['zusamm_inline_button'] = att
+
+
+@ch_router.message(F.content_type == ContentType.VOICE, StateFilter(FSM_ST.erclar))
+async def handle_voice_message(message: Message, state:FSMContext):
+    """Принимает голосовое сообщение и обрабатывает его."""
+    user_id = message.from_user.id
+    file_id = message.voice.file_id
+    words = wav_path = ''
+    try:
+        words, wav_path = await process_audio_file(file_id, user_id)
+        if words:
+            print(f"Распознанные слова: {words}")
+        else:
+            print("Не удалось распознать текст.")
+    finally:
+        # Удаляем временные файлы
+        if os.path.exists(wav_path):
+            try:
+                os.remove(wav_path)
+                print(f"Файл {wav_path} успешно удалён.")
+            except Exception as e:
+                print(f"Ошибка при удалении файла {wav_path}: {e}")
+                pass
+        else:
+            print(f"Файл {wav_path} не существует.")
+            pass
+    user_dict = await state.get_data()
+    erc = user_dict['erc']
+    control_set = sprech_dict[erc][1]
+    if isinstance(words, set):
+        if len(words.intersection(control_set)) > 1:
+            att = await message.answer(f'Das ist <b>{erc}</b> !',
+                                 reply_markup=sprech_kb)
+        else:
+            att = await message.answer('Ich weiß nicht, was das ist! Aber Sie können es mit'
+                                 ' einem anderen Wort versuchen!',
+                                 reply_markup=sprech_kb)
+        users_db[user_id]['bot_answer'] = att
+    else:
+        await message.answer('Sprache nicht erkannt 🤷', reply_markup=sprech_kb)
+
+
+
+
+#############################################################################################
 
 @ch_router.message(Command('admin'), IS_ADMIN())
 async def admin_enter(message: Message):

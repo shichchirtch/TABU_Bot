@@ -13,6 +13,7 @@ class FSM_ST(StatesGroup):
     after_start = State()
     alone = State()
     zusamm = State()
+    erclar = State()
     admin = State()
 
 scheduler = AsyncIOScheduler()
@@ -23,5 +24,12 @@ bot = Bot(token=settings.BOT_TOKEN,
 bot_storage_key = StorageKey(bot_id=bot.id, user_id=bot.id, chat_id=bot.id)
 
 dp = Dispatcher(storage=redis_storage)
+
+user_recording_status = {}
+
+AZURE_API_KEY = settings.AZURE_API_KEY
+
+AZURE_REGION = settings.AZURE_REGION
+
 
 

@@ -35,3 +35,18 @@ class IS_ADMIN(BaseFilter):
             return True
         return False
 
+
+class NEW_ERC_KARD_FILTER(BaseFilter):
+    async def __call__(self, callback: CallbackQuery):
+        if callback.data  == 'neu_sprechkarte':
+            return True
+        return False
+
+class CB_EXIT_FILTER(BaseFilter):
+    async def __call__(self, callback: CallbackQuery):
+        if callback.data  == 'exit_command':
+            return True
+        return False
+
+
+

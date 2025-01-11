@@ -12,6 +12,9 @@ from bot_instance import FSM_ST, dp, bot_storage_key
 from inlinekeyboards import *
 from random import choice
 from postgress_function import kard_inkrement
+import asyncio
+from sprech_carten import sprech_dict
+from process_audio import notify_user_20_seconds
 
 
 
@@ -99,10 +102,71 @@ async def skip_zusamm_process(callback: CallbackQuery, state: FSMContext):
         await callback.answer()
 
 
+##############################################################################################################
+
+@cb_router.callback_query(StateFilter(FSM_ST.erclar), NEW_ERC_KARD_FILTER())
+async def new_card_erklaren(callback: CallbackQuery, state: FSMContext):
+    print('new_card_erklaren works\n\n')
+    user_id = callback.from_user.id
+    temp_data = users_db[user_id]['zusamm_inline_button']
+    if temp_data:
+        with suppress(TelegramBadRequest):
+            temp_message = users_db[user_id]['zusamm_inline_button']
+            await temp_message.delete()
+            users_db[user_id]['zusamm_inline_button'] = ''
+
+    temp_data = users_db[user_id]['bot_answer']
+    if temp_data:
+        with suppress(TelegramBadRequest):
+            temp_message = users_db[user_id]['bot_answer']
+            await temp_message.delete()
+            users_db[user_id]['bot_answer'] = ''
+
+    asyncio.create_task(notify_user_20_seconds(user_id))
+    definitiv = choice(sorted(sprech_dict))  # blume
+    neue_card = sprech_dict[definitiv]
+    await state.update_data(erc=definitiv)  # Передаю название объясняемого слова
+    try:
+        await callback.message.edit_media(
+            media=InputMediaPhoto(
+                media=neue_card[0]),
+            reply_markup=sprech_kb)
+    except TelegramBadRequest:
+        print('////Into Exeption 122 line')
+        att = await callback.message.answer_photo(photo=neue_card[0], reply_markup=sprech_kb)
+        users_db[user_id]['zusamm_inline_button'] = att
 
 
 
+@cb_router.callback_query(StateFilter(FSM_ST.erclar), CB_EXIT_FILTER())
+async def exit_aus_erclaren(callback: CallbackQuery, state: FSMContext):
+    print('exit_aus_erclaren')
+    user_id = callback.from_user.id
+    temp_data = users_db[user_id]['bot_answer']
+    if temp_data:
+        with suppress(TelegramBadRequest):
+            temp_message = users_db[user_id]['bot_answer']
+            await temp_message.delete()
+            users_db[user_id]['bot_answer'] = ''
 
+    temp_data = users_db[user_id]['zusamm_inline_button']
+    if temp_data:
+        with suppress(TelegramBadRequest):
+            temp_message = users_db[user_id]['zusamm_inline_button']
+            await temp_message.delete()
+            users_db[user_id]['zusamm_inline_button'] = ''
+
+    await state.set_state(FSM_ST.alone)  # Вывожу из состояния объяснения с ботом
+    await state.update_data(erc='')  # Обнуляю карточку
+
+    temp_data = users_db[user_id]['bot_answer']
+    if temp_data:
+        with suppress(TelegramBadRequest):
+            await temp_data.delete()
+            users_db[user_id]['bot_answer'] = ''
+    att = await callback.message.answer('Sie haben den Kartenerklärungsmodus verlassen')
+    users_db[user_id]['bot_answer'] = att
+    await asyncio.sleep(3)
 
 
 

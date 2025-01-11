@@ -12,6 +12,9 @@ async def set_main_menu(bot):
         BotCommand(command='/help',
                    description='meine Faehigkeiten'),
 
+        BotCommand(command='/erklaeren',
+                   description='Erklären Definiven für Bot'),
+
         BotCommand(command='/zusammen_spielen',
                    description='Spielen mit Freunde'),
 
