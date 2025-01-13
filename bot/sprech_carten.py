@@ -1,15 +1,15 @@
 
 sprech_dict ={
-'blume':('AgACAgIAAxkBAAINiGd-lPeW3DHvrsI6MFvRecvtFVOfAAI17zEbIuT4S7Ht1JPuVdQQAQADAgADeAADNgQ',
+'Blume':('AgACAgIAAxkBAAINiGd-lPeW3DHvrsI6MFvRecvtFVOfAAI17zEbIuT4S7Ht1JPuVdQQAQADAgADeAADNgQ',
          {'pflanze','geschenk', 'garten', 'farben', 'vase', 'frühling', 'wiese', 'biene'}),
 
-'kebab':('AgACAgIAAxkBAAINjWd-lkeB2_zdzc4S6yHKZSrRtJcOAAI57zEbIuT4S9X3Ly81h1lxAQADAgADeAADNgQ',
+'Kebab':('AgACAgIAAxkBAAINjWd-lkeB2_zdzc4S6yHKZSrRtJcOAAI57zEbIuT4S9X3Ly81h1lxAQADAgADeAADNgQ',
          {'fleisch','fastfood', 'brot', 'soße', 'gemüse', 'imbiss', 'türkei', 'hunger'}),
 
-'sauna':('AgACAgIAAxkBAAINj2d-l0k9a0sb1oL5fLZSyykc58ipAAJF7zEbIuT4S8kFNpF5FCkaAQADAgADeAADNgQ',
+'Sauna':('AgACAgIAAxkBAAINj2d-l0k9a0sb1oL5fLZSyykc58ipAAJF7zEbIuT4S8kFNpF5FCkaAQADAgADeAADNgQ',
          {'spa', 'hitze', 'schwitzen', 'wasser', 'freunde', 'gesundheit', 'entspannung', 'finnland'}),
 
-'aspirin':('AgACAgIAAxkBAAINkWd-l3zek3JSgb7GBUvXTjJsDAeSAAJG7zEbIuT4S908yo7hhemBAQADAgADeAADNgQ',
+'Aspirin':('AgACAgIAAxkBAAINkWd-l3zek3JSgb7GBUvXTjJsDAeSAAJG7zEbIuT4S908yo7hhemBAQADAgADeAADNgQ',
            {'tablette', 'kopfweh', 'apotheke', 'schmerz', 'fieber', 'erkalten', 'medizin', 'krank'}),
 
 'Robin Hood' : ('AgACAgIAAxkBAAINk2d-2c7Yh06vUgvxEgIvqKhpphwcAAKq7DEbXV75S9srQj0Q_6r3AQADAgADeAADNgQ',
@@ -79,5 +79,5 @@ sprech_dict ={
 'Tapete':('AgACAgIAAxkBAAINw2d-7bi-JWlcHcQchU5lCkHnOrSWAALc8TEbIuT4S76vj3ugs0NOAQADAgADeQADNgQ',
                {'wand', 'zimmer', 'kleber', 'kleben', 'renovierung', 'papier', 'zuhause', 'rulone', 'große'}),
 
-'casanova':('AgACAgIAAxkBAAINxWd-7cTSRWqXBzRYWAoBwW2FWLybAALd8TEbIuT4SzAtA48UDNXeAQADAgADeQADNgQ',
+'Casanova':('AgACAgIAAxkBAAINxWd-7cTSRWqXBzRYWAoBwW2FWLybAALd8TEbIuT4SzAtA48UDNXeAQADAgADeQADNgQ',
                {'liebe', 'frauen', 'charme', 'romantik', 'besser', 'herz', 'mann', 'schönen', 'viele'})}
